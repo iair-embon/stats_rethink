@@ -1,0 +1,61 @@
+---
+title: "STATISTICAL RETHINKING WINTER 2024 HOMEWORK, WEEK 1"
+author: "Iair Embon"
+date: "2024-01-05"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo=FALSE,message=FALSE,warning=FALSE}
+library(rethinking)
+```
+
+
+## Problem 1
+  
+Suppose the globe tossing data (Lecture 2, Chapter 2) had turned out to
+be 3 water and 11 land. Construct the posterior distribution.
+
+
+```{r p1}
+n_water <- 3
+n_land <- 11
+n <- n_water + n_land
+
+## define grid
+p_grid <- seq(from = 0, to = 1, length.out = 500)
+
+# define prior
+prior <- rep(1,500)
+
+# compute likelihood at each value in grid
+likelihood <- dbinom(n_water, size = n , prob = p_grid)
+
+# compute product of likelihood and prior
+unstd.posterior <- likelihood * prior
+
+# standardize the posterior
+posterior <- unstd.posterior / sum(unstd.posterior)
+
+# sampling method
+samples <- sample(p_grid, prob = posterior, size = 1e4, replace = T)
+
+# plot
+dens(samples)
+```
+
+## Problem 2
+  
+Using the posterior distribution from 1, compute the posterior predictive distribution for the next 5 tosses of the same globe. I recommend you use the sampling method.
+
+```{r p2}
+# number of water in the next 5 tosses 
+set.seed(111)
+w <- rbinom(5, size = n, prob = samples)
+simplehist(w, xlab = 'number of water in the next 5 tosses')
+```
+
+
